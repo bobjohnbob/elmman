@@ -1,0 +1,24 @@
+{
+  "name": "elmman",
+  "version": "1.0.0",
+  "description": "Just me practicing my Elm",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bobjohnbob/elmman.git"
+  },
+  "keywords": [
+    "pacman",
+    "elm",
+    "noob"
+  ],
+  "author": "john@jshaver.net",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bobjohnbob/elmman/issues"
+  },
+  "homepage": "https://github.com/bobjohnbob/elmman#readme"
+}
