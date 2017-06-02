@@ -20,5 +20,8 @@
   "bugs": {
     "url": "https://github.com/bobjohnbob/elmman/issues"
   },
-  "homepage": "https://github.com/bobjohnbob/elmman#readme"
+  "homepage": "https://github.com/bobjohnbob/elmman#readme",
+  "dependencies": {
+    "elm": "^0.18.0"
+  }
 }
