@@ -21,7 +21,10 @@
     "url": "https://github.com/bobjohnbob/elmman/issues"
   },
   "homepage": "https://github.com/bobjohnbob/elmman#readme",
-  "dependencies": {
-    "elm": "^0.18.0"
+  "dependencies": {},
+  "devDependencies": {
+    "elm": "^0.18.0",
+    "elm-oracle": "^1.1.1",
+    "elm-test": "^0.18.6"
   }
 }
