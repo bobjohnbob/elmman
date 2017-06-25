@@ -33,8 +33,14 @@ render model =
         maxOpen =
             90
 
+        frameCount =
+            calculateAnimation (model.time |> inMilliseconds |> round) cycleTime ( 0, maxOpen * 2 )
+
         openness =
-            calculateAnimation (model.time |> inMilliseconds |> round) cycleTime ( 0, maxOpen )
+            if frameCount > maxOpen then
+                maxOpen - toFloat (round (frameCount) % maxOpen)
+            else
+                frameCount
     in
         pacman ( 250, 450 ) (degrees openness)
 

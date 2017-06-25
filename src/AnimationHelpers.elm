@@ -12,4 +12,4 @@ calculateAnimation current cycle range =
         rangeDiff =
             end - start
     in
-        (toFloat (current % cycle)) / (toFloat (cycle)) * rangeDiff + start
+        (toFloat (current % (cycle + 1))) / (toFloat (cycle)) * rangeDiff + start
