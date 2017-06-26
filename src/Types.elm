@@ -16,6 +16,11 @@ type alias Model =
     }
 
 
+type Msg
+    = Tick Time
+    | Tock Time
+
+
 type alias PlayerModel =
     { direction : Direction
     , location : ( Float, Float )
@@ -24,8 +29,3 @@ type alias PlayerModel =
 
 type alias Range =
     ( Float, Float )
-
-
-type Msg
-    = Tick Time
-    | Tock Time
