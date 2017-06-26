@@ -2,36 +2,30 @@ module Tests exposing (..)
 
 import Test exposing (..)
 import Expect
-import Fuzz exposing (list, int, tuple, string)
-import String
+import AnimationHelpers exposing (calculateAnimation)
 
 
 all : Test
 all =
-    describe "Sample Test Suite"
-        [ describe "Unit test examples"
-            [ test "Addition" <|
+    describe "Elmman Test Suite"
+        [ describe "Player logic tests"
+            [ test "Animation frame calculations" <|
                 \() ->
-                    Expect.equal (3 + 7) 10
-            , test "String.left" <|
+                    Expect.equal (calculateAnimation 100 500 ( 0, 200 )) 40
+            , test "Animation frame calculations 2" <|
                 \() ->
-                    Expect.equal "a" (String.left 1 "abcdefg")
-            , test "This test should fail - you should remove it" <|
+                    Expect.equal (calculateAnimation 500 500 ( 0, 200 )) 200
+            , test "Animation frame calculations 3" <|
                 \() ->
-                    Expect.fail "Failed as expected!"
-            ]
-        , describe "Fuzz test examples, using randomly generated input"
-            [ fuzz (list int) "Lists always have positive length" <|
-                \aList ->
-                    List.length aList |> Expect.atLeast 0
-            , fuzz (list int) "Sorting a list does not change its length" <|
-                \aList ->
-                    List.sort aList |> List.length |> Expect.equal (List.length aList)
-            , fuzzWith { runs = 1000 } int "List.member will find an integer in a list containing it" <|
-                \i ->
-                    List.member i [ i ] |> Expect.true "If you see this, List.member returned False!"
-            , fuzz2 string string "The length of a string equals the sum of its substrings' lengths" <|
-                \s1 s2 ->
-                    s1 ++ s2 |> String.length |> Expect.equal (String.length s1 + String.length s2)
+                    Expect.equal (calculateAnimation 501 500 ( 0, 200 )) 0
+            , test "Animation frame calculations 4" <|
+                \() ->
+                    Expect.equal (calculateAnimation 500 500 ( 100, 300 )) 300
+            , test "Animation frame calculations 5" <|
+                \() ->
+                    Expect.equal (calculateAnimation 100 500 ( 100, 300 )) 140
+            , test "Animation frame calculations 6" <|
+                \() ->
+                    Expect.equal (calculateAnimation 100 500 ( -100, 100 )) -60
             ]
         ]
