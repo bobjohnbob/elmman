@@ -1,2 +1,2 @@
 # elmman
-Just me practicing my Elm
+Just me learning Elm!  I'll try to keep the [demo](https://bobjohnbob.github.io/elmman/) updated.
