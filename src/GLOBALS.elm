@@ -1,8 +1,8 @@
 module GLOBALS exposing (..)
 
 
-move_speed =
-    60
+player_move_speed =
+    120
 
 
 character_radius =
