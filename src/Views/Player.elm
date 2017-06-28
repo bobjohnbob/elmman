@@ -27,6 +27,12 @@ import GLOBALS exposing (character_radius)
 render : Model -> Svg msg
 render model =
     let
+        x =
+            Tuple.first model.player.location
+
+        y =
+            Tuple.second model.player.location
+
         cycleTime =
             500
 
@@ -42,7 +48,7 @@ render model =
             else
                 frameCount
     in
-        pacman ( 250, 450 ) (degrees openness)
+        pacman ( x, y ) (degrees openness)
 
 
 pacman : Point -> Float -> Svg msg
