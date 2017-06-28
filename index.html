@@ -6308,6 +6308,190 @@ var _elm_lang$core$Json_Decode$int = _elm_lang$core$Native_Json.decodePrimitive(
 var _elm_lang$core$Json_Decode$bool = _elm_lang$core$Native_Json.decodePrimitive('bool');
 var _elm_lang$core$Json_Decode$string = _elm_lang$core$Native_Json.decodePrimitive('string');
 var _elm_lang$core$Json_Decode$Decoder = {ctor: 'Decoder'};
+var _elm_lang$dom$Native_Dom = function() {
+
+var fakeNode = {
+	addEventListener: function() {},
+	removeEventListener: function() {}
+};
+
+var onDocument = on(typeof document !== 'undefined' ? document : fakeNode);
+var onWindow = on(typeof window !== 'undefined' ? window : fakeNode);
+
+function on(node)
+{
+	return function(eventName, decoder, toTask)
+	{
+		return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback) {
+
+			function performTask(event)
+			{
+				var result = A2(_elm_lang$core$Json_Decode$decodeValue, decoder, event);
+				if (result.ctor === 'Ok')
+				{
+					_elm_lang$core$Native_Scheduler.rawSpawn(toTask(result._0));
+				}
+			}
+
+			node.addEventListener(eventName, performTask);
+
+			return function()
+			{
+				node.removeEventListener(eventName, performTask);
+			};
+		});
+	};
+}
+
+var rAF = typeof requestAnimationFrame !== 'undefined'
+	? requestAnimationFrame
+	: function(callback) { callback(); };
+
+function withNode(id, doStuff)
+{
+	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+	{
+		rAF(function()
+		{
+			var node = document.getElementById(id);
+			if (node === null)
+			{
+				callback(_elm_lang$core$Native_Scheduler.fail({ ctor: 'NotFound', _0: id }));
+				return;
+			}
+			callback(_elm_lang$core$Native_Scheduler.succeed(doStuff(node)));
+		});
+	});
+}
+
+
+// FOCUS
+
+function focus(id)
+{
+	return withNode(id, function(node) {
+		node.focus();
+		return _elm_lang$core$Native_Utils.Tuple0;
+	});
+}
+
+function blur(id)
+{
+	return withNode(id, function(node) {
+		node.blur();
+		return _elm_lang$core$Native_Utils.Tuple0;
+	});
+}
+
+
+// SCROLLING
+
+function getScrollTop(id)
+{
+	return withNode(id, function(node) {
+		return node.scrollTop;
+	});
+}
+
+function setScrollTop(id, desiredScrollTop)
+{
+	return withNode(id, function(node) {
+		node.scrollTop = desiredScrollTop;
+		return _elm_lang$core$Native_Utils.Tuple0;
+	});
+}
+
+function toBottom(id)
+{
+	return withNode(id, function(node) {
+		node.scrollTop = node.scrollHeight;
+		return _elm_lang$core$Native_Utils.Tuple0;
+	});
+}
+
+function getScrollLeft(id)
+{
+	return withNode(id, function(node) {
+		return node.scrollLeft;
+	});
+}
+
+function setScrollLeft(id, desiredScrollLeft)
+{
+	return withNode(id, function(node) {
+		node.scrollLeft = desiredScrollLeft;
+		return _elm_lang$core$Native_Utils.Tuple0;
+	});
+}
+
+function toRight(id)
+{
+	return withNode(id, function(node) {
+		node.scrollLeft = node.scrollWidth;
+		return _elm_lang$core$Native_Utils.Tuple0;
+	});
+}
+
+
+// SIZE
+
+function width(options, id)
+{
+	return withNode(id, function(node) {
+		switch (options.ctor)
+		{
+			case 'Content':
+				return node.scrollWidth;
+			case 'VisibleContent':
+				return node.clientWidth;
+			case 'VisibleContentWithBorders':
+				return node.offsetWidth;
+			case 'VisibleContentWithBordersAndMargins':
+				var rect = node.getBoundingClientRect();
+				return rect.right - rect.left;
+		}
+	});
+}
+
+function height(options, id)
+{
+	return withNode(id, function(node) {
+		switch (options.ctor)
+		{
+			case 'Content':
+				return node.scrollHeight;
+			case 'VisibleContent':
+				return node.clientHeight;
+			case 'VisibleContentWithBorders':
+				return node.offsetHeight;
+			case 'VisibleContentWithBordersAndMargins':
+				var rect = node.getBoundingClientRect();
+				return rect.bottom - rect.top;
+		}
+	});
+}
+
+return {
+	onDocument: F3(onDocument),
+	onWindow: F3(onWindow),
+
+	focus: focus,
+	blur: blur,
+
+	getScrollTop: getScrollTop,
+	setScrollTop: F2(setScrollTop),
+	getScrollLeft: getScrollLeft,
+	setScrollLeft: F2(setScrollLeft),
+	toBottom: toBottom,
+	toRight: toRight,
+
+	height: F2(height),
+	width: F2(width)
+};
+
+}();
+var _elm_lang$dom$Dom_LowLevel$onWindow = _elm_lang$dom$Native_Dom.onWindow;
+var _elm_lang$dom$Dom_LowLevel$onDocument = _elm_lang$dom$Native_Dom.onDocument;
 var _elm_lang$virtual_dom$VirtualDom_Debug$wrap;
 var _elm_lang$virtual_dom$VirtualDom_Debug$wrapWithFlags;
 
@@ -8343,6 +8527,174 @@ var _elm_lang$html$Html$details = _elm_lang$html$Html$node('details');
 var _elm_lang$html$Html$summary = _elm_lang$html$Html$node('summary');
 var _elm_lang$html$Html$menuitem = _elm_lang$html$Html$node('menuitem');
 var _elm_lang$html$Html$menu = _elm_lang$html$Html$node('menu');
+var _elm_lang$keyboard$Keyboard$onSelfMsg = F3(
+	function (router, _p0, state) {
+		var _p1 = _p0;
+		var _p2 = A2(_elm_lang$core$Dict$get, _p1.category, state);
+		if (_p2.ctor === 'Nothing') {
+			return _elm_lang$core$Task$succeed(state);
+		} else {
+			var send = function (tagger) {
+				return A2(
+					_elm_lang$core$Platform$sendToApp,
+					router,
+					tagger(_p1.keyCode));
+			};
+			return A2(
+				_elm_lang$core$Task$andThen,
+				function (_p3) {
+					return _elm_lang$core$Task$succeed(state);
+				},
+				_elm_lang$core$Task$sequence(
+					A2(_elm_lang$core$List$map, send, _p2._0.taggers)));
+		}
+	});
+var _elm_lang$keyboard$Keyboard_ops = _elm_lang$keyboard$Keyboard_ops || {};
+_elm_lang$keyboard$Keyboard_ops['&>'] = F2(
+	function (task1, task2) {
+		return A2(
+			_elm_lang$core$Task$andThen,
+			function (_p4) {
+				return task2;
+			},
+			task1);
+	});
+var _elm_lang$keyboard$Keyboard$init = _elm_lang$core$Task$succeed(_elm_lang$core$Dict$empty);
+var _elm_lang$keyboard$Keyboard$categorizeHelpHelp = F2(
+	function (value, maybeValues) {
+		var _p5 = maybeValues;
+		if (_p5.ctor === 'Nothing') {
+			return _elm_lang$core$Maybe$Just(
+				{
+					ctor: '::',
+					_0: value,
+					_1: {ctor: '[]'}
+				});
+		} else {
+			return _elm_lang$core$Maybe$Just(
+				{ctor: '::', _0: value, _1: _p5._0});
+		}
+	});
+var _elm_lang$keyboard$Keyboard$categorizeHelp = F2(
+	function (subs, subDict) {
+		categorizeHelp:
+		while (true) {
+			var _p6 = subs;
+			if (_p6.ctor === '[]') {
+				return subDict;
+			} else {
+				var _v4 = _p6._1,
+					_v5 = A3(
+					_elm_lang$core$Dict$update,
+					_p6._0._0,
+					_elm_lang$keyboard$Keyboard$categorizeHelpHelp(_p6._0._1),
+					subDict);
+				subs = _v4;
+				subDict = _v5;
+				continue categorizeHelp;
+			}
+		}
+	});
+var _elm_lang$keyboard$Keyboard$categorize = function (subs) {
+	return A2(_elm_lang$keyboard$Keyboard$categorizeHelp, subs, _elm_lang$core$Dict$empty);
+};
+var _elm_lang$keyboard$Keyboard$keyCode = A2(_elm_lang$core$Json_Decode$field, 'keyCode', _elm_lang$core$Json_Decode$int);
+var _elm_lang$keyboard$Keyboard$subscription = _elm_lang$core$Native_Platform.leaf('Keyboard');
+var _elm_lang$keyboard$Keyboard$Watcher = F2(
+	function (a, b) {
+		return {taggers: a, pid: b};
+	});
+var _elm_lang$keyboard$Keyboard$Msg = F2(
+	function (a, b) {
+		return {category: a, keyCode: b};
+	});
+var _elm_lang$keyboard$Keyboard$onEffects = F3(
+	function (router, newSubs, oldState) {
+		var rightStep = F3(
+			function (category, taggers, task) {
+				return A2(
+					_elm_lang$core$Task$andThen,
+					function (state) {
+						return A2(
+							_elm_lang$core$Task$andThen,
+							function (pid) {
+								return _elm_lang$core$Task$succeed(
+									A3(
+										_elm_lang$core$Dict$insert,
+										category,
+										A2(_elm_lang$keyboard$Keyboard$Watcher, taggers, pid),
+										state));
+							},
+							_elm_lang$core$Process$spawn(
+								A3(
+									_elm_lang$dom$Dom_LowLevel$onDocument,
+									category,
+									_elm_lang$keyboard$Keyboard$keyCode,
+									function (_p7) {
+										return A2(
+											_elm_lang$core$Platform$sendToSelf,
+											router,
+											A2(_elm_lang$keyboard$Keyboard$Msg, category, _p7));
+									})));
+					},
+					task);
+			});
+		var bothStep = F4(
+			function (category, _p8, taggers, task) {
+				var _p9 = _p8;
+				return A2(
+					_elm_lang$core$Task$map,
+					A2(
+						_elm_lang$core$Dict$insert,
+						category,
+						A2(_elm_lang$keyboard$Keyboard$Watcher, taggers, _p9.pid)),
+					task);
+			});
+		var leftStep = F3(
+			function (category, _p10, task) {
+				var _p11 = _p10;
+				return A2(
+					_elm_lang$keyboard$Keyboard_ops['&>'],
+					_elm_lang$core$Process$kill(_p11.pid),
+					task);
+			});
+		return A6(
+			_elm_lang$core$Dict$merge,
+			leftStep,
+			bothStep,
+			rightStep,
+			oldState,
+			_elm_lang$keyboard$Keyboard$categorize(newSubs),
+			_elm_lang$core$Task$succeed(_elm_lang$core$Dict$empty));
+	});
+var _elm_lang$keyboard$Keyboard$MySub = F2(
+	function (a, b) {
+		return {ctor: 'MySub', _0: a, _1: b};
+	});
+var _elm_lang$keyboard$Keyboard$presses = function (tagger) {
+	return _elm_lang$keyboard$Keyboard$subscription(
+		A2(_elm_lang$keyboard$Keyboard$MySub, 'keypress', tagger));
+};
+var _elm_lang$keyboard$Keyboard$downs = function (tagger) {
+	return _elm_lang$keyboard$Keyboard$subscription(
+		A2(_elm_lang$keyboard$Keyboard$MySub, 'keydown', tagger));
+};
+var _elm_lang$keyboard$Keyboard$ups = function (tagger) {
+	return _elm_lang$keyboard$Keyboard$subscription(
+		A2(_elm_lang$keyboard$Keyboard$MySub, 'keyup', tagger));
+};
+var _elm_lang$keyboard$Keyboard$subMap = F2(
+	function (func, _p12) {
+		var _p13 = _p12;
+		return A2(
+			_elm_lang$keyboard$Keyboard$MySub,
+			_p13._0,
+			function (_p14) {
+				return func(
+					_p13._1(_p14));
+			});
+	});
+_elm_lang$core$Native_Platform.effectManagers['Keyboard'] = {pkg: 'elm-lang/keyboard', init: _elm_lang$keyboard$Keyboard$init, onEffects: _elm_lang$keyboard$Keyboard$onEffects, onSelfMsg: _elm_lang$keyboard$Keyboard$onSelfMsg, tag: 'sub', subMap: _elm_lang$keyboard$Keyboard$subMap};
 var _elm_lang$svg$Svg$map = _elm_lang$virtual_dom$VirtualDom$map;
 var _elm_lang$svg$Svg$text = _elm_lang$virtual_dom$VirtualDom$text;
 var _elm_lang$svg$Svg$svgNamespace = A2(
@@ -9794,12 +10146,36 @@ var _user$project$Types$Right = {ctor: 'Right'};
 var _user$project$Types$Left = {ctor: 'Left'};
 var _user$project$Types$Down = {ctor: 'Down'};
 var _user$project$Types$Up = {ctor: 'Up'};
+var _user$project$Types$NoKeyAction = {ctor: 'NoKeyAction'};
+var _user$project$Types$MoveRight = {ctor: 'MoveRight'};
+var _user$project$Types$MoveLeft = {ctor: 'MoveLeft'};
+var _user$project$Types$MoveDown = {ctor: 'MoveDown'};
+var _user$project$Types$MoveUp = {ctor: 'MoveUp'};
+var _user$project$Types$Press = function (a) {
+	return {ctor: 'Press', _0: a};
+};
 var _user$project$Types$Tock = function (a) {
 	return {ctor: 'Tock', _0: a};
 };
 var _user$project$Types$Tick = function (a) {
 	return {ctor: 'Tick', _0: a};
 };
+var _user$project$AnimationHelpers$fmod = F2(
+	function (lh, rh) {
+		return lh - (_elm_lang$core$Basics$toFloat(
+			_elm_lang$core$Basics$floor(lh / rh)) * rh);
+	});
+var _user$project$AnimationHelpers$distanceFromSpeed = F2(
+	function (pixPerSec, millis) {
+		return (pixPerSec * millis) / 1000;
+	});
+var _user$project$AnimationHelpers$movePosition = F3(
+	function (position, direction, distance) {
+		var rads = _elm_lang$core$Basics$degrees(direction);
+		var x = _elm_lang$core$Tuple$first(position) + (_elm_lang$core$Basics$cos(rads) * distance);
+		var y = _elm_lang$core$Tuple$second(position) + (_elm_lang$core$Basics$sin(rads) * distance);
+		return {ctor: '_Tuple2', _0: x, _1: y};
+	});
 var _user$project$AnimationHelpers$calculateAnimation = F3(
 	function (current, cycle, range) {
 		var _p0 = range;
@@ -9811,7 +10187,7 @@ var _user$project$AnimationHelpers$calculateAnimation = F3(
 	});
 var _user$project$GLOBALS$playAreaSize = {ctor: '_Tuple2', _0: '500', _1: '900'};
 var _user$project$GLOBALS$character_radius = 25;
-var _user$project$GLOBALS$move_speed = 60;
+var _user$project$GLOBALS$player_move_speed = 120;
 var _user$project$Init_Player$init = {
 	direction: _user$project$Types$Right,
 	location: {ctor: '_Tuple2', _0: 250, _1: 450}
@@ -9825,21 +10201,152 @@ var _user$project$Subscriptions$subscriptions = function (model) {
 			_1: {
 				ctor: '::',
 				_0: _elm_lang$animation_frame$AnimationFrame$diffs(_user$project$Types$Tock),
-				_1: {ctor: '[]'}
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$keyboard$Keyboard$downs(_user$project$Types$Press),
+					_1: {ctor: '[]'}
+				}
 			}
 		});
 };
 var _user$project$Updates_Player$update = F2(
 	function (msg, model) {
-		return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+		var _p0 = msg;
+		switch (_p0.ctor) {
+			case 'Tick':
+				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+			case 'Tock':
+				var distance = A2(_user$project$AnimationHelpers$distanceFromSpeed, _user$project$GLOBALS$player_move_speed, _p0._0);
+				var direction = function () {
+					var _p1 = model.direction;
+					switch (_p1.ctor) {
+						case 'Right':
+							return 0;
+						case 'Up':
+							return 270;
+						case 'Left':
+							return 180;
+						default:
+							return 90;
+					}
+				}();
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							location: A3(_user$project$AnimationHelpers$movePosition, model.location, direction, distance)
+						}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			default:
+				var keyMap = {
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: _user$project$Types$MoveUp,
+						_1: {
+							ctor: '::',
+							_0: 38,
+							_1: {ctor: '[]'}
+						}
+					},
+					_1: {
+						ctor: '::',
+						_0: {
+							ctor: '_Tuple2',
+							_0: _user$project$Types$MoveDown,
+							_1: {
+								ctor: '::',
+								_0: 40,
+								_1: {ctor: '[]'}
+							}
+						},
+						_1: {
+							ctor: '::',
+							_0: {
+								ctor: '_Tuple2',
+								_0: _user$project$Types$MoveLeft,
+								_1: {
+									ctor: '::',
+									_0: 37,
+									_1: {ctor: '[]'}
+								}
+							},
+							_1: {
+								ctor: '::',
+								_0: {
+									ctor: '_Tuple2',
+									_0: _user$project$Types$MoveRight,
+									_1: {
+										ctor: '::',
+										_0: 39,
+										_1: {ctor: '[]'}
+									}
+								},
+								_1: {ctor: '[]'}
+							}
+						}
+					}
+				};
+				var direction = A3(
+					_elm_lang$core$List$foldl,
+					F2(
+						function (_p2, found) {
+							var _p3 = _p2;
+							return A2(_elm_lang$core$List$member, _p0._0, _p3._1) ? _p3._0 : found;
+						}),
+					_user$project$Types$NoKeyAction,
+					keyMap);
+				var _p4 = direction;
+				switch (_p4.ctor) {
+					case 'MoveUp':
+						return {
+							ctor: '_Tuple2',
+							_0: _elm_lang$core$Native_Utils.update(
+								model,
+								{direction: _user$project$Types$Up}),
+							_1: _elm_lang$core$Platform_Cmd$none
+						};
+					case 'MoveDown':
+						return {
+							ctor: '_Tuple2',
+							_0: _elm_lang$core$Native_Utils.update(
+								model,
+								{direction: _user$project$Types$Down}),
+							_1: _elm_lang$core$Platform_Cmd$none
+						};
+					case 'MoveLeft':
+						return {
+							ctor: '_Tuple2',
+							_0: _elm_lang$core$Native_Utils.update(
+								model,
+								{direction: _user$project$Types$Left}),
+							_1: _elm_lang$core$Platform_Cmd$none
+						};
+					case 'MoveRight':
+						return {
+							ctor: '_Tuple2',
+							_0: _elm_lang$core$Native_Utils.update(
+								model,
+								{direction: _user$project$Types$Right}),
+							_1: _elm_lang$core$Platform_Cmd$none
+						};
+					default:
+						return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+				}
+		}
 	});
 var _user$project$Updates_Time$update = F2(
 	function (msg, model) {
 		var _p0 = msg;
-		if (_p0.ctor === 'Tick') {
-			return {ctor: '_Tuple2', _0: _p0._0, _1: _elm_lang$core$Platform_Cmd$none};
-		} else {
-			return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+		switch (_p0.ctor) {
+			case 'Tick':
+				return {ctor: '_Tuple2', _0: _p0._0, _1: _elm_lang$core$Platform_Cmd$none};
+			case 'Tock':
+				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+			default:
+				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 		}
 	});
 var _user$project$Updates_All$update = F2(
@@ -9932,9 +10439,11 @@ var _user$project$Views_Player$render = function (model) {
 			_elm_lang$core$Basics_ops['%'],
 			_elm_lang$core$Basics$round(frameCount),
 			maxOpen))) : frameCount;
+	var y = _elm_lang$core$Tuple$second(model.player.location);
+	var x = _elm_lang$core$Tuple$first(model.player.location);
 	return A2(
 		_user$project$Views_Player$pacman,
-		{ctor: '_Tuple2', _0: 250, _1: 450},
+		{ctor: '_Tuple2', _0: x, _1: y},
 		_elm_lang$core$Basics$degrees(openness));
 };
 var _user$project$Views_PlayArea$render = F3(
