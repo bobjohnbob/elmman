@@ -2,12 +2,16 @@ module GLOBALS exposing (..)
 
 
 player_move_speed =
-    120
+    150
 
 
 character_radius =
-    25
+    20
 
 
 playAreaSize =
-    ( "500", "900" )
+    ( 800, 880 )
+
+
+backgroundColor =
+    "black"

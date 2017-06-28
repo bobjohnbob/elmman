@@ -14,5 +14,5 @@ view model =
     in
         div []
             [ h1 [] [ text "ElmMan!" ]
-            , Views.PlayArea.render width height model
+            , Views.PlayArea.render (toString width) (toString height) model
             ]
