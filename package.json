@@ -4,7 +4,8 @@
   "description": "Just me practicing my Elm",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "docker run -it --rm -v \"$(pwd):/code\" -w \"/code\" -e \"HOME=/tmp\" -u $UID:$GID codesimple/elm:0.18 test",
+	"build-demo": "docker run -it --rm -v \"$(pwd):/code\" -w \"/code\" -e \"HOME=/tmp\" -u $UID:$GID codesimple/elm:0.18 make --output index.html main.elm"
   },
   "repository": {
     "type": "git",
