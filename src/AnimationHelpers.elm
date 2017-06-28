@@ -39,3 +39,8 @@ distanceFromSpeed pixPerSec millis =
 fmod : Float -> Float -> Float
 fmod lh rh =
     lh - (toFloat (floor (lh / rh)) * rh)
+
+
+rectToRectCollision : ( Point, Point ) -> ( Point, Point ) -> Bool
+rectToRectCollision ( ( ax1, ay1 ), ( ax2, ay2 ) ) ( ( bx1, by1 ), ( bx2, by2 ) ) =
+    ax1 < bx2 && ax2 > bx1 && ay1 < by2 && ay2 > by1

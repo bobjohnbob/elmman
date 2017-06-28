@@ -2,7 +2,14 @@ module Tests exposing (..)
 
 import Test exposing (..)
 import Expect
-import AnimationHelpers exposing (calculateAnimation, movePosition, distanceFromSpeed, fmod)
+import AnimationHelpers
+    exposing
+        ( calculateAnimation
+        , movePosition
+        , distanceFromSpeed
+        , fmod
+        , rectToRectCollision
+        )
 
 
 trimFloatX : Int -> Float -> Float
@@ -106,5 +113,19 @@ all =
                     Expect.equal
                         (fmod 51934 123)
                         28
+            ]
+        , describe "Rectangle collision testing"
+            [ test "No collision" <|
+                \() ->
+                    Expect.false "Expect rectangles not to collide" <|
+                        rectToRectCollision
+                            ( ( 10, 10 ), ( 20, 30 ) )
+                            ( ( 30, 50 ), ( 40, 60 ) )
+            , test "Collide left" <|
+                \() ->
+                    Expect.true "Expect rectangles to collide" <|
+                        rectToRectCollision
+                            ( ( 30, 10 ), ( 50, 30 ) )
+                            ( ( 10, 10 ), ( 40, 30 ) )
             ]
         ]
