@@ -1,29 +1,24 @@
 module Views.Map exposing (..)
 
 import GLOBALS exposing (backgroundColor, playAreaSize)
-import Svg exposing (Svg, g, path)
-import Svg.Attributes exposing (d, fill)
+import Svg exposing (Svg, g, path, rect)
+import Svg.Attributes exposing (d, fill, x, y, width, height)
 import Svg.Path exposing (pathToString, lineTo, subpath, startAt, closed)
 
 
 render : Svg msg
 render =
     let
-        ( width, height ) =
+        ( areaWidth, areaHeight ) =
             playAreaSize
     in
         g []
-            [ path
-                [ d <|
-                    pathToString
-                        [ subpath (startAt ( 0, 0 ))
-                            closed
-                            [ lineTo ( width, 0 )
-                            , lineTo ( width, height )
-                            , lineTo ( 0, height )
-                            ]
-                        ]
-                , fill backgroundColor
+            [ rect
+                [ fill backgroundColor
+                , width (toString areaWidth)
+                , height (toString areaHeight)
+                , x (toString 0)
+                , y (toString 0)
                 ]
                 []
             ]
