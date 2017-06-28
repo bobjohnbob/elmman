@@ -7,4 +7,5 @@ init : PlayerModel
 init =
     { direction = Right
     , location = ( 250, 450 )
+    , moving = False
     }

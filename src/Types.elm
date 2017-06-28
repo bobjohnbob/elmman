@@ -34,6 +34,7 @@ type Msg
 type alias PlayerModel =
     { direction : Direction
     , location : ( Float, Float )
+    , moving : Bool
     }
 
 

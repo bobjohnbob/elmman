@@ -18,27 +18,30 @@ update msg model =
             ( model, Cmd.none )
 
         Tock timeDiff ->
-            let
-                direction =
-                    case model.direction of
-                        Right ->
-                            0
+            if model.moving then
+                let
+                    direction =
+                        case model.direction of
+                            Right ->
+                                0
 
-                        Up ->
-                            270
+                            Up ->
+                                270
 
-                        Left ->
-                            180
+                            Left ->
+                                180
 
-                        Down ->
-                            90
+                            Down ->
+                                90
 
-                distance =
-                    distanceFromSpeed player_move_speed timeDiff
-            in
-                ( { model | location = movePosition model.location direction distance }
-                , Cmd.none
-                )
+                    distance =
+                        distanceFromSpeed player_move_speed timeDiff
+                in
+                    ( { model | location = movePosition model.location direction distance }
+                    , Cmd.none
+                    )
+            else
+                ( model, Cmd.none )
 
         Press keyCode ->
             let
@@ -62,16 +65,16 @@ update msg model =
             in
                 case direction of
                     MoveUp ->
-                        ( { model | direction = Up }, Cmd.none )
+                        ( { model | direction = Up, moving = True }, Cmd.none )
 
                     MoveDown ->
-                        ( { model | direction = Down }, Cmd.none )
+                        ( { model | direction = Down, moving = True }, Cmd.none )
 
                     MoveLeft ->
-                        ( { model | direction = Left }, Cmd.none )
+                        ( { model | direction = Left, moving = True }, Cmd.none )
 
                     MoveRight ->
-                        ( { model | direction = Right }, Cmd.none )
+                        ( { model | direction = Right, moving = True }, Cmd.none )
 
                     NoKeyAction ->
                         ( model, Cmd.none )
