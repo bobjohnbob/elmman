@@ -6,6 +6,7 @@ import Svg.Attributes
     exposing
         ( fill
         , d
+        , transform
         )
 import Svg.Path
     exposing
@@ -20,7 +21,7 @@ import Svg.Path
         , largestArc
         )
 import AnimationHelpers exposing (calculateAnimation)
-import Types exposing (Model)
+import Types exposing (Model, Direction(Up, Down, Left, Right))
 import GLOBALS exposing (character_radius)
 
 
@@ -39,6 +40,20 @@ render model =
         maxOpen =
             90
 
+        rotate =
+            case model.player.direction of
+                Up ->
+                    270
+
+                Down ->
+                    90
+
+                Left ->
+                    180
+
+                Right ->
+                    0
+
         frameCount =
             calculateAnimation (model.time |> inMilliseconds |> round) cycleTime ( 0, maxOpen * 2 )
 
@@ -48,11 +63,11 @@ render model =
             else
                 frameCount
     in
-        pacman ( x, y ) (degrees openness)
+        pacman ( x, y ) (degrees openness) rotate
 
 
-pacman : Point -> Float -> Svg msg
-pacman position openness =
+pacman : Point -> Float -> Float -> Svg msg
+pacman position openness rotate =
     let
         opp =
             character_radius * sin (openness / 2)
@@ -62,6 +77,12 @@ pacman position openness =
 
         radiuses =
             ( character_radius, character_radius )
+
+        ( centerX, centerY ) =
+            position
+
+        transformValue =
+            "rotate(" ++ (toString rotate) ++ " " ++ (toString centerX) ++ " " ++ (toString centerY) ++ ")"
     in
         g []
             [ path
@@ -76,6 +97,7 @@ pacman position openness =
                           )
                         ]
                 , fill "#ffff00"
+                , transform transformValue
                 ]
                 []
             ]
