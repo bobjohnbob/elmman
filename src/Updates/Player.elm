@@ -25,13 +25,13 @@ update msg model =
                             0
 
                         Up ->
-                            90
+                            270
 
                         Left ->
                             180
 
                         Down ->
-                            270
+                            90
 
                 distance =
                     distanceFromSpeed player_move_speed timeDiff
