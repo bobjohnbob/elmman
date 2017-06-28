@@ -2,36 +2,109 @@ module Tests exposing (..)
 
 import Test exposing (..)
 import Expect
-import Fuzz exposing (list, int, tuple, string)
-import String
+import AnimationHelpers exposing (calculateAnimation, movePosition, distanceFromSpeed, fmod)
+
+
+trimFloatX : Int -> Float -> Float
+trimFloatX precision num =
+    ((num * toFloat (10 ^ precision)) |> round |> toFloat) / toFloat (10 ^ precision)
+
+
+trimTupleX : Int -> ( Float, Float ) -> ( Float, Float )
+trimTupleX precision ( first, second ) =
+    ( trimFloatX precision first, trimFloatX precision second )
+
+
+trimFloat1 =
+    trimFloatX 1
+
+
+trimTuple1 =
+    trimTupleX 1
 
 
 all : Test
 all =
-    describe "Sample Test Suite"
-        [ describe "Unit test examples"
-            [ test "Addition" <|
+    describe "Elmman Test Suite"
+        [ describe "Animations frame mapping function"
+            [ test "Animation frame calculations" <|
                 \() ->
-                    Expect.equal (3 + 7) 10
-            , test "String.left" <|
+                    Expect.equal (calculateAnimation 100 500 ( 0, 200 )) 40
+            , test "Animation frame calculations 2" <|
                 \() ->
-                    Expect.equal "a" (String.left 1 "abcdefg")
-            , test "This test should fail - you should remove it" <|
+                    Expect.equal (calculateAnimation 500 500 ( 0, 200 )) 200
+            , test "Animation frame calculations 3" <|
                 \() ->
-                    Expect.fail "Failed as expected!"
+                    Expect.equal (calculateAnimation 501 500 ( 0, 200 )) 0
+            , test "Animation frame calculations with increased range" <|
+                \() ->
+                    Expect.equal (calculateAnimation 500 500 ( 100, 300 )) 300
+            , test "Animation frame calculations with increased range 2" <|
+                \() ->
+                    Expect.equal (calculateAnimation 100 500 ( 100, 300 )) 140
+            , test "Animation frame calculations with negative range" <|
+                \() ->
+                    Expect.equal (calculateAnimation 100 500 ( -100, 100 )) -60
             ]
-        , describe "Fuzz test examples, using randomly generated input"
-            [ fuzz (list int) "Lists always have positive length" <|
-                \aList ->
-                    List.length aList |> Expect.atLeast 0
-            , fuzz (list int) "Sorting a list does not change its length" <|
-                \aList ->
-                    List.sort aList |> List.length |> Expect.equal (List.length aList)
-            , fuzzWith { runs = 1000 } int "List.member will find an integer in a list containing it" <|
-                \i ->
-                    List.member i [ i ] |> Expect.true "If you see this, List.member returned False!"
-            , fuzz2 string string "The length of a string equals the sum of its substrings' lengths" <|
-                \s1 s2 ->
-                    s1 ++ s2 |> String.length |> Expect.equal (String.length s1 + String.length s2)
+        , describe "Position movement function"
+            [ test "Move 45 degrees 10 units" <|
+                \() ->
+                    Expect.equal
+                        (trimTuple1 (movePosition ( 0, 0 ) 45 10))
+                        ( 7.1, 7.1 )
+            , test "Move 45 degrees 200 units from 10,10" <|
+                \() ->
+                    Expect.equal
+                        (trimTuple1 (movePosition ( 10, 10 ) 45 200))
+                        ( 151.4, 151.4 )
+            , test "Move 158 degrees 200 units" <|
+                \() ->
+                    Expect.equal
+                        (trimTuple1 (movePosition ( 0, 0 ) 158 200))
+                        ( -185.4, 74.9 )
+            , test "Move 360 degrees 200 units" <|
+                \() ->
+                    Expect.equal
+                        (trimTuple1 (movePosition ( 0, 0 ) 360 200))
+                        ( 200, 0 )
+            , test "Move 312 degrees 150 units" <|
+                \() ->
+                    Expect.equal
+                        (trimTuple1 (movePosition ( 0, 0 ) 312 150))
+                        ( 100.4, -111.5 )
+            ]
+        , describe "convert speed/time to distance function"
+            [ test "speed 200u/s for 4ms" <|
+                \() ->
+                    Expect.equal
+                        (trimFloat1 (distanceFromSpeed 200 4))
+                        0.8
+            , test "speed 2000u/s for 1ms" <|
+                \() ->
+                    Expect.equal
+                        (distanceFromSpeed 2000 1)
+                        2
+            , test "speed 1 u/s for 1ms" <|
+                \() ->
+                    Expect.equal
+                        (distanceFromSpeed 1 1)
+                        0.001
+            , test "speed 1 u/s for 1000ms" <|
+                \() ->
+                    Expect.equal
+                        (distanceFromSpeed 1 1000)
+                        1
+            ]
+        , describe "modulus for float"
+            [ test "10.15 % 9" <|
+                \() ->
+                    Expect.equal
+                        (trimFloatX 2 (fmod 10.15 9))
+                        1.15
+            , test "51934 % 123" <|
+                \() ->
+                    Expect.equal
+                        (fmod 51934 123)
+                        28
             ]
         ]
