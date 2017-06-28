@@ -10138,9 +10138,9 @@ var _user$project$Types$Model = F2(
 	function (a, b) {
 		return {time: a, player: b};
 	});
-var _user$project$Types$PlayerModel = F2(
-	function (a, b) {
-		return {direction: a, location: b};
+var _user$project$Types$PlayerModel = F3(
+	function (a, b, c) {
+		return {direction: a, location: b, moving: c};
 	});
 var _user$project$Types$Right = {ctor: 'Right'};
 var _user$project$Types$Left = {ctor: 'Left'};
@@ -10160,6 +10160,12 @@ var _user$project$Types$Tock = function (a) {
 var _user$project$Types$Tick = function (a) {
 	return {ctor: 'Tick', _0: a};
 };
+var _user$project$AnimationHelpers$rectToRectCollision = F2(
+	function (_p1, _p0) {
+		var _p2 = _p1;
+		var _p3 = _p0;
+		return (_elm_lang$core$Native_Utils.cmp(_p2._0._0, _p3._1._0) < 0) && ((_elm_lang$core$Native_Utils.cmp(_p2._1._0, _p3._0._0) > 0) && ((_elm_lang$core$Native_Utils.cmp(_p2._0._1, _p3._1._1) < 0) && (_elm_lang$core$Native_Utils.cmp(_p2._1._1, _p3._0._1) > 0)));
+	});
 var _user$project$AnimationHelpers$fmod = F2(
 	function (lh, rh) {
 		return lh - (_elm_lang$core$Basics$toFloat(
@@ -10178,19 +10184,21 @@ var _user$project$AnimationHelpers$movePosition = F3(
 	});
 var _user$project$AnimationHelpers$calculateAnimation = F3(
 	function (current, cycle, range) {
-		var _p0 = range;
-		var start = _p0._0;
-		var end = _p0._1;
+		var _p4 = range;
+		var start = _p4._0;
+		var end = _p4._1;
 		var rangeDiff = end - start;
 		return ((_elm_lang$core$Basics$toFloat(
 			A2(_elm_lang$core$Basics_ops['%'], current, cycle + 1)) / _elm_lang$core$Basics$toFloat(cycle)) * rangeDiff) + start;
 	});
-var _user$project$GLOBALS$playAreaSize = {ctor: '_Tuple2', _0: '500', _1: '900'};
-var _user$project$GLOBALS$character_radius = 25;
-var _user$project$GLOBALS$player_move_speed = 120;
+var _user$project$GLOBALS$backgroundColor = 'black';
+var _user$project$GLOBALS$playAreaSize = {ctor: '_Tuple2', _0: 800, _1: 880};
+var _user$project$GLOBALS$character_radius = 20;
+var _user$project$GLOBALS$player_move_speed = 150;
 var _user$project$Init_Player$init = {
 	direction: _user$project$Types$Right,
-	location: {ctor: '_Tuple2', _0: 250, _1: 450}
+	location: {ctor: '_Tuple2', _0: 250, _1: 450},
+	moving: false
 };
 var _user$project$Init_All$init = {time: 0, player: _user$project$Init_Player$init};
 var _user$project$Subscriptions$subscriptions = function (model) {
@@ -10216,29 +10224,33 @@ var _user$project$Updates_Player$update = F2(
 			case 'Tick':
 				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 			case 'Tock':
-				var distance = A2(_user$project$AnimationHelpers$distanceFromSpeed, _user$project$GLOBALS$player_move_speed, _p0._0);
-				var direction = function () {
-					var _p1 = model.direction;
-					switch (_p1.ctor) {
-						case 'Right':
-							return 0;
-						case 'Up':
-							return 270;
-						case 'Left':
-							return 180;
-						default:
-							return 90;
-					}
-				}();
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{
-							location: A3(_user$project$AnimationHelpers$movePosition, model.location, direction, distance)
-						}),
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
+				if (model.moving) {
+					var distance = A2(_user$project$AnimationHelpers$distanceFromSpeed, _user$project$GLOBALS$player_move_speed, _p0._0);
+					var direction = function () {
+						var _p1 = model.direction;
+						switch (_p1.ctor) {
+							case 'Right':
+								return 0;
+							case 'Up':
+								return 270;
+							case 'Left':
+								return 180;
+							default:
+								return 90;
+						}
+					}();
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{
+								location: A3(_user$project$AnimationHelpers$movePosition, model.location, direction, distance)
+							}),
+						_1: _elm_lang$core$Platform_Cmd$none
+					};
+				} else {
+					return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+				}
 			default:
 				var keyMap = {
 					ctor: '::',
@@ -10305,7 +10317,7 @@ var _user$project$Updates_Player$update = F2(
 							ctor: '_Tuple2',
 							_0: _elm_lang$core$Native_Utils.update(
 								model,
-								{direction: _user$project$Types$Up}),
+								{direction: _user$project$Types$Up, moving: true}),
 							_1: _elm_lang$core$Platform_Cmd$none
 						};
 					case 'MoveDown':
@@ -10313,7 +10325,7 @@ var _user$project$Updates_Player$update = F2(
 							ctor: '_Tuple2',
 							_0: _elm_lang$core$Native_Utils.update(
 								model,
-								{direction: _user$project$Types$Down}),
+								{direction: _user$project$Types$Down, moving: true}),
 							_1: _elm_lang$core$Platform_Cmd$none
 						};
 					case 'MoveLeft':
@@ -10321,7 +10333,7 @@ var _user$project$Updates_Player$update = F2(
 							ctor: '_Tuple2',
 							_0: _elm_lang$core$Native_Utils.update(
 								model,
-								{direction: _user$project$Types$Left}),
+								{direction: _user$project$Types$Left, moving: true}),
 							_1: _elm_lang$core$Platform_Cmd$none
 						};
 					case 'MoveRight':
@@ -10329,7 +10341,7 @@ var _user$project$Updates_Player$update = F2(
 							ctor: '_Tuple2',
 							_0: _elm_lang$core$Native_Utils.update(
 								model,
-								{direction: _user$project$Types$Right}),
+								{direction: _user$project$Types$Right, moving: true}),
 							_1: _elm_lang$core$Platform_Cmd$none
 						};
 					default:
@@ -10371,8 +10383,30 @@ var _user$project$Updates_All$update = F2(
 			});
 		return {ctor: '_Tuple2', _0: returnModel, _1: commands};
 	});
-var _user$project$Views_Player$pacman = F2(
-	function (position, openness) {
+var _user$project$Views_Player$pacman = F3(
+	function (position, openness, rotate) {
+		var _p0 = position;
+		var centerX = _p0._0;
+		var centerY = _p0._1;
+		var transformValue = A2(
+			_elm_lang$core$Basics_ops['++'],
+			'rotate(',
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				_elm_lang$core$Basics$toString(rotate),
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					' ',
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						_elm_lang$core$Basics$toString(centerX),
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							' ',
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								_elm_lang$core$Basics$toString(centerY),
+								')'))))));
 		var radiuses = {ctor: '_Tuple2', _0: _user$project$GLOBALS$character_radius, _1: _user$project$GLOBALS$character_radius};
 		var adj = _user$project$GLOBALS$character_radius * _elm_lang$core$Basics$cos(openness / 2);
 		var opp = _user$project$GLOBALS$character_radius * _elm_lang$core$Basics$sin(openness / 2);
@@ -10418,7 +10452,11 @@ var _user$project$Views_Player$pacman = F2(
 						_1: {
 							ctor: '::',
 							_0: _elm_lang$svg$Svg_Attributes$fill('#ffff00'),
-							_1: {ctor: '[]'}
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$svg$Svg_Attributes$transform(transformValue),
+								_1: {ctor: '[]'}
+							}
 						}
 					},
 					{ctor: '[]'}),
@@ -10426,6 +10464,19 @@ var _user$project$Views_Player$pacman = F2(
 			});
 	});
 var _user$project$Views_Player$render = function (model) {
+	var rotate = function () {
+		var _p1 = model.player.direction;
+		switch (_p1.ctor) {
+			case 'Up':
+				return 270;
+			case 'Down':
+				return 90;
+			case 'Left':
+				return 180;
+			default:
+				return 0;
+		}
+	}();
 	var maxOpen = 90;
 	var cycleTime = 500;
 	var frameCount = A3(
@@ -10441,11 +10492,52 @@ var _user$project$Views_Player$render = function (model) {
 			maxOpen))) : frameCount;
 	var y = _elm_lang$core$Tuple$second(model.player.location);
 	var x = _elm_lang$core$Tuple$first(model.player.location);
-	return A2(
+	return A3(
 		_user$project$Views_Player$pacman,
 		{ctor: '_Tuple2', _0: x, _1: y},
-		_elm_lang$core$Basics$degrees(openness));
+		_elm_lang$core$Basics$degrees(openness),
+		rotate);
 };
+var _user$project$Views_Map$render = function () {
+	var _p0 = _user$project$GLOBALS$playAreaSize;
+	var areaWidth = _p0._0;
+	var areaHeight = _p0._1;
+	return A2(
+		_elm_lang$svg$Svg$g,
+		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$svg$Svg$rect,
+				{
+					ctor: '::',
+					_0: _elm_lang$svg$Svg_Attributes$fill(_user$project$GLOBALS$backgroundColor),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$svg$Svg_Attributes$width(
+							_elm_lang$core$Basics$toString(areaWidth)),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$svg$Svg_Attributes$height(
+								_elm_lang$core$Basics$toString(areaHeight)),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$svg$Svg_Attributes$x(
+									_elm_lang$core$Basics$toString(0)),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$svg$Svg_Attributes$y(
+										_elm_lang$core$Basics$toString(0)),
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}
+				},
+				{ctor: '[]'}),
+			_1: {ctor: '[]'}
+		});
+}();
 var _user$project$Views_PlayArea$render = F3(
 	function (w, h, model) {
 		return A2(
@@ -10472,8 +10564,12 @@ var _user$project$Views_PlayArea$render = F3(
 			},
 			{
 				ctor: '::',
-				_0: _user$project$Views_Player$render(model),
-				_1: {ctor: '[]'}
+				_0: _user$project$Views_Map$render,
+				_1: {
+					ctor: '::',
+					_0: _user$project$Views_Player$render(model),
+					_1: {ctor: '[]'}
+				}
 			});
 	});
 var _user$project$Views_Body$view = function (model) {
@@ -10495,7 +10591,11 @@ var _user$project$Views_Body$view = function (model) {
 				}),
 			_1: {
 				ctor: '::',
-				_0: A3(_user$project$Views_PlayArea$render, width, height, model),
+				_0: A3(
+					_user$project$Views_PlayArea$render,
+					_elm_lang$core$Basics$toString(width),
+					_elm_lang$core$Basics$toString(height),
+					model),
 				_1: {ctor: '[]'}
 			}
 		});
