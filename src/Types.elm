@@ -1,6 +1,7 @@
 module Types exposing (..)
 
 import Time exposing (Time)
+import Keyboard exposing (KeyCode)
 
 
 type Direction
@@ -8,6 +9,14 @@ type Direction
     | Down
     | Left
     | Right
+
+
+type KeyAction
+    = MoveUp
+    | MoveDown
+    | MoveLeft
+    | MoveRight
+    | NoKeyAction
 
 
 type alias Model =
@@ -19,6 +28,7 @@ type alias Model =
 type Msg
     = Tick Time
     | Tock Time
+    | Press KeyCode
 
 
 type alias PlayerModel =
