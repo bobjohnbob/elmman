@@ -1,7 +1,7 @@
 module Views.Body exposing (..)
 
 import Html exposing (Html, h1, div, text)
-import GLOBALS exposing (playAreaSize)
+import GLOBALS exposing (play_area_size)
 import Types exposing (Model, Range)
 import Views.PlayArea
 
@@ -10,7 +10,7 @@ view : Model -> Html msg
 view model =
     let
         ( width, height ) =
-            playAreaSize
+            play_area_size
     in
         div []
             [ h1 [] [ text "ElmMan!" ]

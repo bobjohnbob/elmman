@@ -9,9 +9,9 @@ character_radius =
     20
 
 
-playAreaSize =
+play_area_size =
     ( 800, 880 )
 
 
-backgroundColor =
+background_color =
     "black"

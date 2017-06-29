@@ -31,6 +31,18 @@ movePosition position direction distance =
         ( x, y )
 
 
+wrapLocation : Point -> Point -> Point
+wrapLocation maxLocation location =
+    let
+        ( x, y ) =
+            location
+
+        ( maxX, maxY ) =
+            maxLocation
+    in
+        ( (fmod x maxX), (fmod y maxY) )
+
+
 distanceFromSpeed : Float -> Float -> Float
 distanceFromSpeed pixPerSec millis =
     pixPerSec * millis / 1000
