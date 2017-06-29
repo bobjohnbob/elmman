@@ -10175,6 +10175,20 @@ var _user$project$AnimationHelpers$distanceFromSpeed = F2(
 	function (pixPerSec, millis) {
 		return (pixPerSec * millis) / 1000;
 	});
+var _user$project$AnimationHelpers$wrapLocation = F2(
+	function (maxLocation, location) {
+		var _p4 = maxLocation;
+		var maxX = _p4._0;
+		var maxY = _p4._1;
+		var _p5 = location;
+		var x = _p5._0;
+		var y = _p5._1;
+		return {
+			ctor: '_Tuple2',
+			_0: A2(_user$project$AnimationHelpers$fmod, x, maxX),
+			_1: A2(_user$project$AnimationHelpers$fmod, y, maxY)
+		};
+	});
 var _user$project$AnimationHelpers$movePosition = F3(
 	function (position, direction, distance) {
 		var rads = _elm_lang$core$Basics$degrees(direction);
@@ -10184,15 +10198,15 @@ var _user$project$AnimationHelpers$movePosition = F3(
 	});
 var _user$project$AnimationHelpers$calculateAnimation = F3(
 	function (current, cycle, range) {
-		var _p4 = range;
-		var start = _p4._0;
-		var end = _p4._1;
+		var _p6 = range;
+		var start = _p6._0;
+		var end = _p6._1;
 		var rangeDiff = end - start;
 		return ((_elm_lang$core$Basics$toFloat(
 			A2(_elm_lang$core$Basics_ops['%'], current, cycle + 1)) / _elm_lang$core$Basics$toFloat(cycle)) * rangeDiff) + start;
 	});
-var _user$project$GLOBALS$backgroundColor = 'black';
-var _user$project$GLOBALS$playAreaSize = {ctor: '_Tuple2', _0: 800, _1: 880};
+var _user$project$GLOBALS$background_color = 'black';
+var _user$project$GLOBALS$play_area_size = {ctor: '_Tuple2', _0: 800, _1: 880};
 var _user$project$GLOBALS$character_radius = 20;
 var _user$project$GLOBALS$player_move_speed = 150;
 var _user$project$Init_Player$init = {
@@ -10239,13 +10253,15 @@ var _user$project$Updates_Player$update = F2(
 								return 90;
 						}
 					}();
+					var newLocation = A2(
+						_user$project$AnimationHelpers$wrapLocation,
+						_user$project$GLOBALS$play_area_size,
+						A3(_user$project$AnimationHelpers$movePosition, model.location, direction, distance));
 					return {
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
 							model,
-							{
-								location: A3(_user$project$AnimationHelpers$movePosition, model.location, direction, distance)
-							}),
+							{location: newLocation}),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				} else {
@@ -10499,7 +10515,7 @@ var _user$project$Views_Player$render = function (model) {
 		rotate);
 };
 var _user$project$Views_Map$render = function () {
-	var _p0 = _user$project$GLOBALS$playAreaSize;
+	var _p0 = _user$project$GLOBALS$play_area_size;
 	var areaWidth = _p0._0;
 	var areaHeight = _p0._1;
 	return A2(
@@ -10511,7 +10527,7 @@ var _user$project$Views_Map$render = function () {
 				_elm_lang$svg$Svg$rect,
 				{
 					ctor: '::',
-					_0: _elm_lang$svg$Svg_Attributes$fill(_user$project$GLOBALS$backgroundColor),
+					_0: _elm_lang$svg$Svg_Attributes$fill(_user$project$GLOBALS$background_color),
 					_1: {
 						ctor: '::',
 						_0: _elm_lang$svg$Svg_Attributes$width(
@@ -10573,7 +10589,7 @@ var _user$project$Views_PlayArea$render = F3(
 			});
 	});
 var _user$project$Views_Body$view = function (model) {
-	var _p0 = _user$project$GLOBALS$playAreaSize;
+	var _p0 = _user$project$GLOBALS$play_area_size;
 	var width = _p0._0;
 	var height = _p0._1;
 	return A2(
