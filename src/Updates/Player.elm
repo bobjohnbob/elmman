@@ -7,8 +7,8 @@ import Types
         , Msg(Tick, Tock, Press)
         , KeyAction(MoveUp, MoveDown, MoveLeft, MoveRight, NoKeyAction)
         )
-import AnimationHelpers exposing (movePosition, distanceFromSpeed)
-import GLOBALS exposing (player_move_speed)
+import AnimationHelpers exposing (movePosition, distanceFromSpeed, wrapLocation)
+import GLOBALS exposing (player_move_speed, play_area_size)
 
 
 update : Msg -> PlayerModel -> ( PlayerModel, Cmd Msg )
@@ -36,8 +36,12 @@ update msg model =
 
                     distance =
                         distanceFromSpeed player_move_speed timeDiff
+
+                    newLocation =
+                        movePosition model.location direction distance
+                            |> wrapLocation play_area_size
                 in
-                    ( { model | location = movePosition model.location direction distance }
+                    ( { model | location = newLocation }
                     , Cmd.none
                     )
             else
