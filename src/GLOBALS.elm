@@ -6,11 +6,11 @@ player_move_speed =
 
 
 character_radius =
-    20
+    200
 
 
 play_area_size =
-    ( 800, 880 )
+    ( 1900, 900 )
 
 
 background_color =
